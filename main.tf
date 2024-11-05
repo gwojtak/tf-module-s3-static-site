@@ -28,6 +28,11 @@ locals {
       for dom in var.subdomain_redirects : dom => aws_s3_bucket.redirect[dom].arn
     }
   )
+  cloudfront_enabled = var.cdn_provider == "CLOUDFRONT"
+  policy_principals = {
+    type        = var.cdn_provider == "CLOUDFRONT" ? "AWS" : "*"
+    identifiers = var.cdn_provider == "CLOUDFRONT" ? [aws_cloudfront_origin_access_identity.oai["cdn"].iam_arn] : ["*"]
+  }
 }
 
 data "aws_iam_policy_document" "bucket_policy" {
@@ -40,8 +45,8 @@ data "aws_iam_policy_document" "bucket_policy" {
     resources = ["${local.bucket_arns[each.value]}/*"]
 
     principals {
-      type        = "*"
-      identifiers = ["*"]
+      type        = local.policy_principals["type"]
+      identifiers = local.policy_principals["identifiers"]
     }
   }
 }
@@ -56,12 +61,11 @@ resource "aws_s3_bucket" "main" {
 }
 
 resource "aws_s3_bucket_public_access_block" "main" {
-  bucket = aws_s3_bucket.main.id
-
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
+  bucket                  = aws_s3_bucket.main.id
+  block_public_acls       = local.cloudfront_enabled
+  block_public_policy     = local.cloudfront_enabled
+  ignore_public_acls      = local.cloudfront_enabled
+  restrict_public_buckets = local.cloudfront_enabled
 }
 
 resource "aws_s3_bucket_policy" "main" {
@@ -80,6 +84,8 @@ resource "aws_s3_bucket_versioning" "main" {
 }
 
 resource "aws_s3_bucket_website_configuration" "main" {
+  for_each = local.cloudfront_enabled ? toset([]) : toset([var.domain])
+
   bucket = aws_s3_bucket.main.id
 
   index_document {

@@ -1,19 +1,22 @@
-output "main_bucket_id" {
-  description = "The ID of the created main website S3 bucket."
-  value       = aws_s3_bucket.main.id
+output "primary_s3_bucket" {
+  description = "The object of the main S3 bucket created."
+  value       = aws_s3_bucket.main
 }
 
-output "alternate_bucket_ids" {
-  description = "The IDs of the created redirect S3 buckets."
-  value       = { for sd in var.subdomain_redirects : sd => aws_s3_bucket.redirect[sd].id }
+output "redirect_s3_bucket" {
+  description = "The objects for any created redirect buckets."
+  value       = [for bucket in aws_s3_bucket.redirect : bucket]
 }
 
-output "website_endpoint" {
-  description = "The DNS name of the location of the website hosted in S3."
-  value       = aws_s3_bucket_website_configuration.main.website_endpoint
+output "bucket_policies" {
+  description = "The policies attached to each bucket."
+  value = concat(
+    [aws_s3_bucket_policy.main],
+    [for pol in aws_s3_bucket_policy.redirect : pol]
+  )
 }
 
-output "redirect_website_endpoints" {
-  description = "The DNS names of the locations of the redirect buckets."
-  value       = { for sd in var.subdomain_redirects : sd => aws_s3_bucket_website_configuration.redirect[sd].website_endpoint }
+output "cloudfront_distribution" {
+  description = "Cloudfront distribution object created in the module."
+  value       = local.cloudfront_enabled ? aws_cloudfront_distribution.cdn["cdn"] : null
 }

@@ -14,10 +14,10 @@ resource "aws_s3_bucket_public_access_block" "redirect" {
 
   bucket = aws_s3_bucket.redirect[each.value].id
 
-  block_public_acls       = true
-  block_public_policy     = false
-  ignore_public_acls      = true
-  restrict_public_buckets = false
+  block_public_acls       = local.cloudfront_enabled
+  block_public_policy     = local.cloudfront_enabled
+  ignore_public_acls      = local.cloudfront_enabled
+  restrict_public_buckets = local.cloudfront_enabled
 }
 
 resource "aws_s3_bucket_policy" "redirect" {
@@ -28,7 +28,7 @@ resource "aws_s3_bucket_policy" "redirect" {
 }
 
 resource "aws_s3_bucket_website_configuration" "redirect" {
-  for_each = toset(var.subdomain_redirects)
+  for_each = local.cloudfront_enabled ? toset([]) : toset(var.subdomain_redirects)
 
   bucket = aws_s3_bucket.redirect[each.value].id
 

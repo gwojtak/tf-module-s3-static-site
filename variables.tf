@@ -1,3 +1,19 @@
+variable "acm_certificate_arn" {
+  description = "If `cdn_provider` is `CLOUDFRONT`, set the value of the ACM certificate here."
+  type        = string
+  default     = null
+}
+
+variable "cdn_provider" {
+  description = "Set a CDN provider to use.  Valid values are `NONE` and `CLOUDFRONT`."
+  type        = string
+  default     = "NONE"
+  validation {
+    condition     = contains(["NONE", "CLOUDFRONT"], var.cdn_provider)
+    error_message = "Valid values for cdn_provider are 'NONE' and 'CLOUDFRONT'."
+  }
+}
+
 variable "domain" {
   description = "The name of the domain the website is to be located at."
   type        = string
