@@ -38,6 +38,8 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [aws_cloudfront_distribution.cdn](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution) | resource |
+| [aws_cloudfront_origin_access_identity.oai](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_origin_access_identity) | resource |
 | [aws_s3_bucket.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
 | [aws_s3_bucket.redirect](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
 | [aws_s3_bucket_policy.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_policy) | resource |
@@ -53,6 +55,8 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_acm_certificate_arn"></a> [acm\_certificate\_arn](#input\_acm\_certificate\_arn) | If `cdn_provider` is `CLOUDFRONT`, set the value of the ACM certificate here. | `string` | `null` | no |
+| <a name="input_cdn_provider"></a> [cdn\_provider](#input\_cdn\_provider) | Set a CDN provider to use.  Valid values are `NONE` and `CLOUDFRONT`. | `string` | `"NONE"` | no |
 | <a name="input_domain"></a> [domain](#input\_domain) | The name of the domain the website is to be located at. | `string` | n/a | yes |
 | <a name="input_error_document"></a> [error\_document](#input\_error\_document) | Set this to an S3 key that should be used for 4xx status code errors. | `string` | `""` | no |
 | <a name="input_index_document"></a> [index\_document](#input\_index\_document) | Sets the index document for the site.  Should be a full path within the S3 bucket. | `string` | `"index.html"` | no |
@@ -63,7 +67,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_alternate_bucket_ids"></a> [alternate\_bucket\_ids](#output\_alternate\_bucket\_ids) | The IDs of the created redirect S3 buckets. |
-| <a name="output_main_bucket_id"></a> [main\_bucket\_id](#output\_main\_bucket\_id) | The ID of the created main website S3 bucket. |
-| <a name="output_redirect_website_endpoints"></a> [redirect\_website\_endpoints](#output\_redirect\_website\_endpoints) | The DNS names of the locations of the redirect buckets. |
-| <a name="output_website_endpoint"></a> [website\_endpoint](#output\_website\_endpoint) | The DNS name of the location of the website hosted in S3. |
+| <a name="output_bucket_policies"></a> [bucket\_policies](#output\_bucket\_policies) | The policies attached to each bucket. |
+| <a name="output_cloudfront_distribution"></a> [cloudfront\_distribution](#output\_cloudfront\_distribution) | Cloudfront distribution object created in the module. |
+| <a name="output_primary_s3_bucket"></a> [primary\_s3\_bucket](#output\_primary\_s3\_bucket) | The object of the main S3 bucket created. |
+| <a name="output_redirect_s3_bucket"></a> [redirect\_s3\_bucket](#output\_redirect\_s3\_bucket) | The objects for any created redirect buckets. |

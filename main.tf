@@ -28,11 +28,8 @@ locals {
       for dom in var.subdomain_redirects : dom => aws_s3_bucket.redirect[dom].arn
     }
   )
-  cloudfront_enabled = var.cdn_provider == "CLOUDFRONT"
-  policy_principals = {
-    type        = var.cdn_provider == "CLOUDFRONT" ? "AWS" : "*"
-    identifiers = var.cdn_provider == "CLOUDFRONT" ? [aws_cloudfront_origin_access_identity.oai["cdn"].iam_arn] : ["*"]
-  }
+  cloudfront_enabled  = var.cdn_provider == "CLOUDFRONT"
+  cloudfront_iterator = local.cloudfront_enabled ? toset(["cdn"]) : toset([])
 }
 
 data "aws_iam_policy_document" "bucket_policy" {
@@ -45,8 +42,8 @@ data "aws_iam_policy_document" "bucket_policy" {
     resources = ["${local.bucket_arns[each.value]}/*"]
 
     principals {
-      type        = local.policy_principals["type"]
-      identifiers = local.policy_principals["identifiers"]
+      type        = local.cloudfront_enabled ? "AWS" : "*"
+      identifiers = local.cloudfront_enabled ? [aws_cloudfront_origin_access_identity.oai["cdn"].iam_arn] : ["*"]
     }
   }
 }
